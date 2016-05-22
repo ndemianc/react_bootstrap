@@ -14,7 +14,28 @@
     <div id="app"></div>
     <script type="text/babel">
       var NavBar = React.createClass({
+        propTypes: {
+            brand: React.PropTypes.string.isRequired
+        },
+
+        getDefaultProps: function() {
+          return {
+            brand: 'sdemian v2'
+          }
+        },
+
         render: function() {
+          var homeActive = '';
+          var aboutActive = '';
+
+          switch (this.props.page) {
+            case 'about':
+              aboutActive = 'active';
+              break;
+            case 'home':
+            default:
+              homeActive = 'active';
+          }
           return (
             <div>
             <nav className="navbar navbar-default">
@@ -26,16 +47,13 @@
                     <span className="icon-bar"></span>
                     <span className="icon-bar"></span>
                   </button>
-                  <a className="navbar-brand" href="#">App</a>
+                  <a className="navbar-brand" href="#">{this.props.brand}</a>
                 </div>
 
                 <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                   <ul className="nav navbar-nav">
-                    <li className="active"><a href="#">Link <span className="sr-only">(current)</span></a></li>
-                    <li><a href="#">Link</a></li>
-                  </ul>
-                  <ul className="nav navbar-nav navbar-right">
-                    <li><a href="#">Link</a></li>
+                    <li className={homeActive}><a onClick={this.props.homeClick} href="#">Home</a></li>
+                    <li className={aboutActive}><a onClick={this.props.aboutClick} href="#">About</a></li>
                   </ul>
                 </div>
               </div>
@@ -46,12 +64,26 @@
       });
 
       var Jumbotron = React.createClass({
+        propTypes: {
+          heading: React.PropTypes.string.isRequired,
+          text: React.PropTypes.string.isRequired,
+          link: React.PropTypes.string.isRequired
+        },
+
+        getDefaultProps: function() {
+          return {
+            heading: 'Welcome',
+            text: 'This is our brand new site sdemian v2 using ReactJS',
+            link: 'http://google.com?q=reactjs'
+          }
+        },
+
         render: function() {
           return (
             <div className="jumbotron">
-              <h1>Hello, world!</h1>
-              <p>...</p>
-              <p><a className="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+              <h1>{this.props.heading}</h1>
+              <p>{this.props.text}</p>
+              <p><a className="btn btn-primary btn-lg" href={this.props.link} role="button">Learn more</a></p>
             </div>
           );
         }
@@ -62,7 +94,21 @@
           return (
             <div className="container">
               <div className="row">
-                Main Content
+                <h2 className='page-header'>Home</h2>
+                <p>Some content...</p>
+              </div>
+            </div>
+          );
+        }
+      });
+
+      var PageAbout = React.createClass({
+        render: function() {
+          return (
+            <div className="container">
+              <div className="row">
+                <h2 className='page-header'>About us</h2>
+                <p>Some content...</p>
               </div>
             </div>
           );
@@ -84,12 +130,42 @@
       });
 
       var App = React.createClass({
+        getInitialState: function() {
+          return {
+            page: 'home'
+          };
+        },
+        handleHomeClick: function() {
+          this.setState({
+            page: 'home'
+          });
+        },
+        handleAboutClick: function() {
+          this.setState({
+            page: 'about'
+          });
+        },
         render: function() {
+          var jumbotron = '';
+          var page = '';
+          switch (this.state.page) {
+            case 'about':
+              page = <PageAbout />;
+              break;
+            case 'home':
+              page = <PageHome />;
+            default:
+              jumbotron = <Jumbotron />;
+          }
           return (
             <div>
-              <NavBar />
-              <Jumbotron />
-              <PageHome />
+              <NavBar
+                page={this.state.page}
+                homeClick={this.handleHomeClick}
+                aboutClick={this.handleAboutClick}
+                />
+              {jumbotron}
+              {page}
               <Footer />
             </div>
           );
